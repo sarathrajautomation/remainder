@@ -1,0 +1,36 @@
+# File: .github/workflows/playwright-scheduled.yml
+name: 🧪 Run Playwright Tests Daily
+
+on:
+  schedule:
+    - cron: '0 7 * * *'  # every day at 7 AM UTC
+  workflow_dispatch:      # also allows manual trigger
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Set Up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🧩 Install Browsers
+        run: npx playwright install --with-deps
+
+      - name: ▶️ Run Tests
+        run: npx playwright test
+
+      - name: 📊 Upload HTML Report (optional)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
