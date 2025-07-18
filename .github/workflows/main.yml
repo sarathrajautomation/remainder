@@ -1,16 +1,16 @@
-name: Playwright Tests
+name: Playwright Tests (Weekly)
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Runs every 5 minutes
-  workflow_dispatch:        # Allows manual trigger from GitHub UI
+    - cron: '0 9 * * 1'  # Runs at 09:00 UTC every Monday
+  workflow_dispatch:     # Optional: allows manual run from GitHub UI
 
 jobs:
   run-playwright:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Setup Node.js
@@ -24,5 +24,5 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Run Playwright tests
+      - name: Run Playwright Tests
         run: npx playwright test
