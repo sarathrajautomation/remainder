@@ -1,12 +1,17 @@
 const { test, expect } = require('@playwright/test');
 import nodemailer from 'nodemailer';
-const emailList = [
-    'raneeshap@techcedence.com',
-    'sakanar@techcedence.com'
+const XLSX = require('xlsx');
+const fs = require('fs');
+const path = require('path');
+
+let emailList = [
+
 
 ];
 
+let Week;
 
+let table = {};
 
 
 const transporter = nodemailer.createTransport({
@@ -21,10 +26,79 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+function convertintoJson(table) {
+
+    const rows = table.trim().split("\n");
+
+    // Extract headers from the first row
+    const headers = rows[0].trim().split(/\s{2,}|\t+/);
+
+    // Process each row into an object
+    const json = rows.slice(1).map(row => {
+        const values = row.trim().split(/\s{2,}|\t+/);
+        return headers.reduce((acc, header, i) => {
+            acc[header] = values[i];
+            return acc;
+        }, {});
+    });
+
+    return json
 
 
+}
 
+async function sendEmailWithAttachment(to, subject, body, attachmentPath) {
+    const transporter = nodemailer.createTransport({
+        service: "gmail", // or "outlook", "yahoo"
+        auth: {
+            user: "dummyemailforuse508@gmail.com",
+            pass: "ldqv sdoq drgz ihku ", // Use app password, not regular password
+        },
+        tls: {
+            rejectUnauthorized: false // 👈 Allow self-signed certs (use only in dev)
+        }
+    });
 
+    const mailOptions = {
+        from: "QA Team",
+        to: to,
+        subject: subject,
+        text: body,
+        attachments: [
+            {
+                filename: path.basename(attachmentPath),
+                path: attachmentPath,
+            },
+        ],
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent successfully to", to);
+}
+/**
+ * Create an Excel file and add data to it.
+ * @param {string} fileName - Name of the Excel file to be created.
+ * @param {string} sheetName - Name of the sheet inside the workbook.
+ * @param {Array<Object>} data - Array of objects to write in the Excel sheet.
+ */
+function createExcelFile(fileName, sheetName, data) {
+    // 1. Create a new workbook
+    const workbook = XLSX.utils.book_new();
+
+    // 2. Convert JSON data to worksheet
+    const worksheet = XLSX.utils.json_to_sheet(data);
+
+    // 3. Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+    // 4. Define file path
+    const filePath = path.resolve(__dirname, fileName);
+
+    // 5. Write the workbook to file
+    XLSX.writeFile(workbook, filePath);
+
+    console.log(`✅ Excel file created: ${filePath}`);
+}
 
 
 
@@ -77,7 +151,7 @@ async function sendEmails() {
   <div class="container">
     <h2>🔔 Timesheet Reminder</h2>
     <p>Dear ${recipient},</p>
-
+<p>${Week}</p>
     <p>This is a gentle reminder to submit your timesheet for the current week. Timely submission helps in accurate payroll processing and project tracking.</p>
 
     <p>Please click the button below to access the timesheet portal:</p>
@@ -128,21 +202,41 @@ test.describe('App Flow (Single Browser Session)', () => {
     });
     test('Get the user not submitted', async () => {
         await page.goto('https://opensource.techcedence.net/lcp-trac-projects/#/');
+        await expect(page.locator("(//div[@class='ng-star-inserted']//div)[2]")).toBeVisible();
+        const text = await page.locator("//body/app-root[1]/app-root[1]/div[1]/div[1]/div[2]/div[1]/div[1]/app-dashboard[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]").innerText();
+
+        Week = text
+        console.log(`Week: ${Week}`);
+
+
         //await expect(page).toHaveTitle('Timesheet');
         await expect(page.locator("//a[@data-entity='submitted_list']")).toBeVisible();
         await page.click("//a[@data-entity='submitted_list']");
 
-        await page.waitForSelector('table');
+
+
+
+
+        const table = await page.locator("table").innerText();
+        let json = convertintoJson(table)
 
         // Extract values from "Name" column (2nd column)
-        const nameColumnCells = await page.locator('table tbody tr td:nth-child(2)');
+        const nameColumnCells = await page.locator('table tbody tr td:nth-child(4)');
         const count = await nameColumnCells.count();
 
         for (let i = 0; i < count; i++) {
             const name = await nameColumnCells.nth(i).textContent();
-            console.log(`Name ${i + 1}:`, name?.trim());
+            // console.log(`Name ${i + 1}:`, name?.trim());
+            emailList.push(name)
         }
-        await sendEmails();
+        //await sendEmails();
+        // console.log(`Email List: ${emailList}`);
+        createExcelFile('timesheet.xlsx', 'Submitted List', json);
+
+        await sendEmailWithAttachment("sarathrajk@techcedence.com", `Timesheet-  ${Week}`, "Below is the List of employee not submitted their timesheet.", path.resolve(__dirname, 'timesheet.xlsx'));
+        //console.log(`Email List: ${emailList}`);
+        //await sendEmails();
+        //console.log(`Emails sent to: ${emailList}`);
     });
 
 
@@ -151,6 +245,9 @@ test.describe('App Flow (Single Browser Session)', () => {
     //     await expect(page).toHaveURL(/.*\/profile/);
     //   });
 });
+
+
+
 
 
 // ✅ Step 2: Create reusable transporter (Gmail example)

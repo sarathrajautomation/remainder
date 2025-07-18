@@ -1,0 +1,26 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Playwright test results
+test-results/
+playwright-report/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+
+# Excel or generated files
+
+
+# VSCode settings
+.vscode/
+
+# Coverage reports
+coverage/
