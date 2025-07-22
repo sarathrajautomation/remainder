@@ -18,8 +18,8 @@ const transporter = nodemailer.createTransport({
     service: "gmail",
     // STARTTLS
     auth: {
-        user: 'dummyemailforuse508@gmail.com',
-        pass: 'ldqv sdoq drgz ihku '
+        user: "pkpraveen082@gmail.com",
+        pass: "frxp bdqo mmaz yjbo",
     },
     tls: {
         rejectUnauthorized: false // 👈 Allow self-signed certs (use only in dev)
@@ -51,8 +51,8 @@ async function sendEmailWithAttachment(to, subject, body, attachmentPath) {
     const transporter = nodemailer.createTransport({
         service: "gmail", // or "outlook", "yahoo"
         auth: {
-            user: "dummyemailforuse508@gmail.com",
-            pass: "ldqv sdoq drgz ihku ", // Use app password, not regular password
+            user: "pkpraveen082@gmail.com",
+            pass: "frxp bdqo mmaz yjbo", // Use app password, not regular password
         },
         tls: {
             rejectUnauthorized: false // 👈 Allow self-signed certs (use only in dev)
@@ -188,8 +188,8 @@ test.describe('App Flow (Single Browser Session)', () => {
 
         // Login once before all tests
         await page.goto('https://opensource.techcedence.net/lcp-trac-projects/#/login');
-        await page.fill('//input[@type="email"]', 'praveenk@techcedence.com');
-        await page.fill('//input[@type="password"]', 'Test@1234');
+        await page.fill('//input[@type="email"]', 'venkatesha@techcedence.com');
+        await page.fill('//input[@type="password"]', 'VenkatAvinash8*');
         await page.click("//button[text()=' submit ']");
 
     });
@@ -210,8 +210,8 @@ test.describe('App Flow (Single Browser Session)', () => {
 
 
         //await expect(page).toHaveTitle('Timesheet');
-        await expect(page.locator("//a[@data-entity='submitted_list']")).toBeVisible();
-        await page.click("//a[@data-entity='submitted_list']");
+        await expect(page.locator("//a[@data-entity='not_created_list']")).toBeVisible();
+        await page.click("//a[@data-entity='not_created_list']");
 
 
 
@@ -234,8 +234,10 @@ test.describe('App Flow (Single Browser Session)', () => {
         createExcelFile('timesheet.xlsx', 'Submitted List', json);
 
         await sendEmailWithAttachment("sarathrajk@techcedence.com", `Timesheet-  ${Week}`, "Below is the List of employee not submitted their timesheet.", path.resolve(__dirname, 'timesheet.xlsx'));
-        //console.log(`Email List: ${emailList}`);
-        //await sendEmails();
+        emailList = emailList.filter(email => email.includes("@techcedence.com"));
+
+        console.log(`Unsubmited List: ${emailList}`);
+        await sendEmails();
         //console.log(`Emails sent to: ${emailList}`);
     });
 

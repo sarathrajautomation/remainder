@@ -2,8 +2,8 @@ name: Playwright Tests (Weekly)
 
 on:
   schedule:
-    - cron: '0 9 * * 1'  # Runs at 09:00 UTC every Monday
-  workflow_dispatch:     # Optional: allows manual run from GitHub UI
+    - cron: '0 9 * * 1'  # Every Monday at 09:00 UTC
+  workflow_dispatch:     # Allows manual run from GitHub UI
 
 jobs:
   run-playwright:
