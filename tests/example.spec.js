@@ -233,7 +233,7 @@ test.describe('App Flow (Single Browser Session)', () => {
         // console.log(`Email List: ${emailList}`);
         createExcelFile('timesheet.xlsx', 'Submitted List', json);
 
-        await sendEmailWithAttachment("sarathrajk@techcedence.com", `Timesheet-  ${Week}`, "Below is the List of employee not submitted their timesheet.", path.resolve(__dirname, 'timesheet.xlsx'));
+        await sendEmailWithAttachment("venkatesha@techcedence.com", `Timesheet-  ${Week}`, "Below is the List of employee not submitted their timesheet.", path.resolve(__dirname, 'timesheet.xlsx'));
         emailList = emailList.filter(email => email.includes("@techcedence.com"));
 
         console.log(`Unsubmited List: ${emailList}`);
