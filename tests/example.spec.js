@@ -152,7 +152,7 @@ async function sendEmails() {
     <h2>🔔 Timesheet Reminder</h2>
     <p>Dear ${recipient},</p>
 <p>${Week}</p>
-    <p>This is a gentle reminder to submit your timesheet for the current week. Timely submission helps in accurate payroll processing and project tracking.</p>
+    <p>This is a gentle reminder to submit your timesheet for the previous week. Timely submission helps in project tracking.</p>
 
     <p>Please click the button below to access the timesheet portal:</p>
 
@@ -163,9 +163,7 @@ async function sendEmails() {
     <p>Thank you!<br>
     QA Team</p>
 
-    <div class="footer">
-      © 2025 Your Company. All rights reserved.
-    </div>
+    
   </div>
 </body>
 </html>
